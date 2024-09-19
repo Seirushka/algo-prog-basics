@@ -21,7 +21,6 @@ function mark_direct!(robot, side)
     return n
 end
 
-
 #task2
 function chess_mark_direct_0!(robot, side, ::Val{0})
     while !isborder(robot, side)
@@ -43,4 +42,24 @@ function chess_mark_direct_1!(robot, side, ::Val{1})
             putmarker!(robot)
         end
     end
+end
+
+#task3
+function step_direct!(robot, side)
+    count::Int = 0
+    while !isborder(robot, side)
+        move!(robot, side)
+        count += 1
+    end
+    return count
+end
+
+
+function full_mark!(robot, side, edge)
+    while !isborder(robot, edge)
+        mark_direct!(robot, side)
+        side = inverse(side)
+        move!(robot, edge)
+        putmarker!(robot)
+    end    
 end
