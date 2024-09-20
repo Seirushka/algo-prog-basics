@@ -65,6 +65,27 @@ function full_mark!(robot, side, edge)
 end
 
 #task 4
+function diagonal_move!(robot, side_ox, side_oy)
+    count::Int = 0
+    while !isborder(robot, side_ox) && !isborder(robot, side_oy)
+        move!(robot, side_ox)
+        move!(robot, side_oy)
+        putmarker!(robot)
+        count += 1
+    end
+    return count
+end
+
+
+function steps_diagonal_move!(robot, steps, side_ox, side_oy)
+    for _ in 1:steps
+        move!(robot, side_oy)
+        move!(robot, side_ox)
+    end
+end
+
+#task 5
+#task 6
 function edge!(robot, side_ox, side_oy)
     count_ox::Int, count_oy::Int = 0, 0
     while !isborder(robot, side_ox) || !isborder(robot, side_oy)
