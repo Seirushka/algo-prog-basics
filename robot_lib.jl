@@ -1,6 +1,6 @@
 using HorizonSideRobots
 
-#task1
+#task 1
 function HorizonSideRobots.move!(robot, side, num_steps::Integer)
     for _ in 1:num_steps
         move!(robot, side)
@@ -13,7 +13,7 @@ inverse(side::HorizonSide) = HorizonSide((Int(side) + 2) % 4)
 
 function mark_direct!(robot, side)
     n::Int = 0
-    while isborder(robot, side) == 0
+    while !isborder(robot, side)
         move!(robot, side)
         putmarker!(robot)
         n += 1
@@ -21,7 +21,7 @@ function mark_direct!(robot, side)
     return n
 end
 
-#task2
+#task 2
 function chess_mark_direct_0!(robot, side, ::Val{0})
     while !isborder(robot, side)
         move!(robot, side)
@@ -44,7 +44,7 @@ function chess_mark_direct_1!(robot, side, ::Val{1})
     end
 end
 
-#task3
+#task 3
 function step_direct!(robot, side)
     count::Int = 0
     while !isborder(robot, side)
@@ -62,4 +62,29 @@ function full_mark!(robot, side, edge)
         move!(robot, edge)
         putmarker!(robot)
     end    
+end
+
+#task 4
+function edge!(robot, side_ox, side_oy)
+    count_ox::Int, count_oy::Int = 0, 0
+    while !isborder(robot, side_ox) || !isborder(robot, side_oy)
+        count_ox += step_direct!(robot, side_ox)
+        count_oy += step_direct!(robot, side_oy)
+    end
+    return count_ox, count_oy
+end
+
+
+function count_move!(robot, side, count)
+    for _ in 1:count
+        putmarker!(robot)
+        move!(robot, side)
+    end
+end
+
+
+function no_start_marking!(robot, side, count)
+    count_move!(robot, side, count)
+    n::Int = mark_direct!(robot, side)
+    return count + n
 end
