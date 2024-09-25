@@ -170,6 +170,26 @@ function only_start_marking!(robot, side, count)
     return count + n
 end
 
+# task 8
+function perim_edge!(robot, side_x, side_y, size::Int)
+    if size % 2 == 1
+        edge_x = edge_y = div(size, 2)
+        move!(robot, side_x, edge_x)
+        move!(robot, side_y, edge_y)
+    end
+end
+
+
+function side_mark_check!(robot, side, num_steps::Integer)
+    for _ in 1:num_steps
+        move!(robot, side)
+        if ismarker(robot)
+            return 0
+        end
+    end
+    return 1
+end
+
 # task 9
 function chess_mark_full!(robot, side, next, num)
     while !isborder(robot, next)
