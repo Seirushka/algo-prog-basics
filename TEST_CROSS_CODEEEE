@@ -1,0 +1,95 @@
+using HorizonSideRobots
+
+# Задаем структуру поведения шахматиста
+mutable struct ChessRobot
+    robot::Robot
+    flag::Bool
+end
+
+# Задаем структуру поведения пометчика
+struct MarkRobot
+    robot::Robot
+end
+
+
+
+
+# Переменнные
+robot = Robot(animate=1) # База, просто ходит
+mark_robot = MarkRobot(robot) # Ходит, ставит марки
+chess_robot = ChessRobot(robot, true) # Шахматист, ставит марки
+
+
+sides1 = [Nord, Ost, Sud, West]
+sides2 = ((Nord, Ost), (Nord, West), (Sud, Ost), (Sud, West))
+
+# Функция задачи
+function cross!(robot, sides)
+    for side in sides
+        num = move_direct!(robot, side)
+        side = inverse.(side)
+        move!(robot, side, num)
+        break
+    end
+    return nothing
+end
+
+
+
+
+# Функции действий
+function move_direct!(robot, side)
+    n::Int = 0
+    while !isborder(robot, side)
+        move!(robot, side)
+        n += 1
+    end
+    return n
+end
+
+
+function HorizonSideRobots.move!(robot, side, num_steps::Integer)
+    for _ in 1:num_steps
+        move!(robot, side)
+    end
+    return nothing
+end
+
+
+inverse(side::HorizonSide) = HorizonSide((Int(side) + 2) % 4)
+
+
+# Базовые функции где задан кортеж сторон (косой ход)
+HorizonSideRobots.isborder(robot, sides::NTuple{2, HorizonSide}) = isborder(robot, sides[1]) || isborder(robot, sides[2])
+
+
+HorizonSideRobots.move!(robot, sides) = for side in sides move!(robot, side) end
+
+
+# Базовые функции для маркера
+HorizonSideRobots.move!(robot::MarkRobot, side) = move!(robot.robot, side), putmarker!(robot.robot)
+
+
+HorizonSideRobots.isborder(robot::MarkRobot, side) = isborder(robot.robot, side)
+
+
+# Базовые функции для шахматиста
+HorizonSideRobots.move!(robot::ChessRobot, side) = move!(robot.robot, side)
+
+
+HorizonSideRobots.isborder(robot::ChessRobot, side) = isborder(robot.robot, side)
+
+
+function HorizonSideRobots.putmarker!(robot::ChessRobot)
+    robot.flag && putmarker!(robot.robot)
+    robot.flag = !robot.flag
+    return nothing
+end
+
+
+
+# Базовые функции для шахматиста где задан кортеж сторон (косой ход)
+HorizonSideRobots.isborder(robot::ChessRobot, sides::NTuple{2, HorizonSide}) = isborder(robot.robot, sides[1]) || isborder(robot.robot, sides[2])
+
+
+HorizonSideRobots.move!(robot::ChessRobot, sides) = for side in sides move!(robot.robot, side) end
