@@ -1,30 +1,29 @@
 using HorizonSideRobots
 
 # шахматист
-mutable struct ChessRobot
-    robot::Robot, flag::Bool
+mutable struct markChessRobot
+    robot::Robot
+    flag::Bool
 end
-
-#r = Robot(animate=1)
-#chess = ChessRobot(r)
 
 # база
 function full!(robot)
-    coords = edge!(robot, (West, Sud))
-    num = sum(coords)
+    x, y = edge!(robot, (West, Sud))
+    
+    # меняем робота по структуре
+    robot = markChessRobot(robot, (x + y) % 2)
+    
     snake_move!(robot, (Ost, Nord))
-    first_place!(robot, West, Sud, coords.x[], coords.y[])
-    return num
+    first_place!(robot, West, Sud, x, y)
 end
 
 # ф-ции абстрактно
 function edge!(robot, sides::NTuple{2, HorizonSide})
     step_x::Int, step_y::Int = 0, 0
     while !isborder(robot, sides)
-        step_x += end_move!(robot, sides[1])
-        step_y += end_move!(robot, sides[2])
+        step_x += end_move!(robot, sides[1]); step_y += end_move!(robot, sides[2])
     end
-    return (x = Ref(step_x), y = Ref(step_y))
+    return step_x, step_y
 end
 
 
@@ -57,13 +56,18 @@ inverse(side::HorizonSide) = HorizonSide((Int(side) + 2) % 4)
 HorizonSideRobots.move!(robot, side, num) = for _ in 1:num move!(robot, side) end
 
 
-function first_place!(robot, side_x, side_y, x, y)
+function first_place!(robot::Robot, side_x, side_y, x, y)
     edge!(robot, (side_x, side_y))
     side_x, side_y = inverse(side_x), inverse(side_y)
     move!(robot, side_x, x); move!(robot, side_y, y)
 end
 
 # база шахматист
-#function HorizonSideRobots.move!(robot::ChessRobot, side)
+HorizonSideRobots.move!(robot::markChessRobot, side) = begin
+    !robot.flag && putmarker!(robot.robot)
+    move!(robot.robot, side)
+    robot.flag = !robot.flag
+end
 
-#end
+
+HorizonSideRobots.isborder(robot::markChessRobot, side)= isborder(robot.robot, side)
