@@ -6,6 +6,17 @@ mutable struct markChessRobot
     flag::Bool
 end
 
+getbaserobot(robot::markChessRobot) = robot.robot
+
+# база шахматист
+HorizonSideRobots.move!(robot::markChessRobot, side) = begin
+    !robot.flag && putmarker!(robot.robot)
+    move!(robot.robot, side)
+    robot.flag = !robot.flag
+end
+
+HorizonSideRobots.isborder(robot::markChessRobot, side)= isborder(robot.robot, side)
+
 # база
 function full!(robot)
     x, y = edge!(robot, (West, Sud))
@@ -14,7 +25,7 @@ function full!(robot)
     robot = markChessRobot(robot, (x + y) % 2)
     
     snake_move!(robot, (Ost, Nord))
-    first_place!(robot, West, Sud, x, y)
+    first_place!(getbaserobot(robot), West, Sud, x, y)
 end
 
 # ф-ции абстрактно
@@ -56,18 +67,8 @@ inverse(side::HorizonSide) = HorizonSide((Int(side) + 2) % 4)
 HorizonSideRobots.move!(robot, side, num) = for _ in 1:num move!(robot, side) end
 
 
-function first_place!(robot::Robot, side_x, side_y, x, y)
+function first_place!(robot, side_x, side_y, x, y)
     edge!(robot, (side_x, side_y))
     side_x, side_y = inverse(side_x), inverse(side_y)
     move!(robot, side_x, x); move!(robot, side_y, y)
 end
-
-# база шахматист
-HorizonSideRobots.move!(robot::markChessRobot, side) = begin
-    !robot.flag && putmarker!(robot.robot)
-    move!(robot.robot, side)
-    robot.flag = !robot.flag
-end
-
-
-HorizonSideRobots.isborder(robot::markChessRobot, side)= isborder(robot.robot, side)
