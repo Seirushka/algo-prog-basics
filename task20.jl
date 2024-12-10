@@ -1,13 +1,14 @@
 using HorizonSideRobots
-robot = Robot(animate=true)
-function main!(robot,side::HorizonSide)
-    go_to_wall!(robot,side)
+
+r = Robot(animate=true)
+
+
+inverse(side::HorizonSide) = HorizonSide((Int(side) + 2) % 4)
+
+
+function full_mark_back!(robot,side::HorizonSide)
+    if !isborder(robot,side) move!(robot,side)
+    else (putmarker!(robot); return) end 
+    full_mark_back!(robot,side)
     move!(robot,inverse(side))
-end
-inverse(side::HorizonSide)=HorizonSide((Int(side)+2)%4)
-function go_to_wall!(robot,side::HorizonSide)
-    !isborder(robot,side)&&move!(robot,side)
-    !isborder(robot,side)&&(go_to_wall!(robot,side),move!(robot,inverse(side)))
-    isborder(robot,side)&&putmarker!(robot)
-    return nothing
 end
