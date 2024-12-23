@@ -1,6 +1,12 @@
 using HorizonSideRobots
 
 
+function main!()
+    shuttle!(robot, Nord) do side
+        !isborder(robot, side) end
+end
+
+
 function shuttle!(stop_condition::Function, robot, side) 
     side_n, count::Int = Ost, 0
     while !stop_condition(side) 
